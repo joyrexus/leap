@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  .bordered {
+    stroke: #555;
+    stroke-border: 2;
+  }
+  #frame {
+    fill: whitesmoke;
+  }
+  #left {
+    fill: steelblue;
+    opacity: .6;
+  }
+  #right {
+    fill: #777;
+    opacity: .6;
+  }
+</style>
+<body>
+  <svg width="960" height="500">
+    <rect id="frame" class="bordered" width=960 height="500" />
+    <circle id="left" class="bordered" cx="100" cy="100" r="25" />
+    <circle id="right" cx="100" cy="100" r="25" />
+  </svg>
+
+<script src="lib/render.js"></script>
+<script>
+  render('data/sample.json');
+</script>
