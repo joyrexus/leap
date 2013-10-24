@@ -1,9 +1,6 @@
 root = exports ? this
+paused = false
 offset = 300
-$ = (select) -> document.querySelector select
-
-left = $('#left')
-right = $('#right')
   
 moveTo = (pos) -> 
   {x, y, z} = pos
@@ -24,7 +21,7 @@ animate = (data) ->
   step = duration / data.length
   run = -> 
     window.requestAnimationFrame run
-    if data.length
+    if data.length and not paused
       frame = data.shift()
       left.moveTo frame.left.pos
       right.moveTo frame.right.pos
@@ -42,6 +39,6 @@ load = ->
   reader.readAsText File
 
 # click and choose a file to load
-chooser = $('#chooser')
 chooser.addEventListener('change', load)
-$('#file').addEventListener('click', -> chooser.click())
+file.addEventListener('click', -> chooser.click())
+canvas.addEventListener('click', -> paused = not paused)
