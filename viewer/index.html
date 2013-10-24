@@ -42,30 +42,56 @@
   input {
     display: none;
   }
+
+  #range {
+    visibility: hidden;
+  }
+
+  /* SVG screen for viewing hand motions of selected data points */
+  #hands {
+    visibility: hidden;
+  }
+  #frame {
+    fill: whitesmoke;
+  }
+  #left {
+    fill: steelblue;
+    opacity: .6;
+    visibility: hidden;
+  }
+  #right {
+    fill: #777;
+    opacity: .6;
+    visibility: hidden;
+  }
 </style>
 <body>
   <input type="file" id="chooser" />
   <div id="file">Click and choose sample</div>
-  <div id="time">Time</div>
-  <div id="value">Value</div>
-  <div id="canvas"></div>
-  <div id="selection">
+  <div id="time">Time (in seconds)</div>
+  <div id="value">Velocity (in mm/sec)</div>
+  <div id="graph"></div>
+  <div id="range">
     <div id="begin">Begin</div>
     <div id="end">End</div>
   </div>
+  <svg id="hands">
+    <rect id="frame" class="bordered" width=960 height="500" />
+    <circle id="left" cx="100" cy="100" r="25" />
+    <circle id="right" cx="100" cy="100" r="25" />
+  </svg>
 
+<script src="lib/animate.js"></script>
 <script type="text/coffeescript">
-  $ = (selection) -> document.querySelector selection
-
   w = 960         # width
   h = 800         # height
   axis = h/2      # place x-axis halfway down
   tick = 0        # current tick count along x-axis of plot
   clicks = 0      # number of clicks on plot (0, 1, or 2)
   skip = false    # uncaptured data to skip?
-  draw = 'canvas' # global variable for SVG canvas
-  points = []     # array of plotted velocity data points
-  clicked = []    # array of clicked data points
+  draw = 'graph'  # global var for SVG graph
+  points = []     # plotted velocity data points
+  clicked = []    # clicked data points
 
   colors =        # color conventions
     position: 'steelblue'
@@ -100,6 +126,7 @@
       clicked.push @data('clicked', true) # track clicked data points
       selection.begin = @data 'index'
       begin.innerHTML = @data 'time'
+      range.style.visibility = 'visible'
     else                                  # click second time to end
       selection.active = true
       if @data('index') < selection.begin
@@ -117,6 +144,7 @@
         p.stroke(colors.highlight)
         p.data('selected', true)
       clicks = 0                          # reset count
+      # animate points                    # !!! ANIMATION
 
   drawLine = (time, value, tick, color='steelblue') ->
       draw.line(tick, axis, tick, axis - value)
@@ -141,7 +169,7 @@
   plot = (data) -> 
     start = data[0].timestamp
     w = data.length if data.length > w
-    draw = SVG('canvas').size(w, h)
+    draw = SVG('graph').size(w, h)
     draw.rect(w, h).attr("class", "border")
 
     # iterate over each frame/data-point `d`
@@ -156,6 +184,8 @@
           .data('index', i)       # add index for making selections
         v = drawLine(time, velocity, tick, color="#777")
           .data('index', i)       # add index for making selections
+          .data('left', d.left.pos)     # left position coords
+          .data('right', d.right.pos)   # right position coords
           .opacity(.8)
         points.push v             # add data point for velocity
       else
@@ -172,13 +202,10 @@
     return if not File.type.match '\.json$'
     file.textContent = File.name
     reader = new FileReader()
-    reader.onload = (file) ->
-      data = JSON.parse @result
-      plot data, velocity
+    reader.onload = (file) -> plot JSON.parse @result
     reader.readAsText File
 
   # click and choose a file to load
-  chooser = $('#chooser')
   chooser.addEventListener('change', load)
-  $('#file').addEventListener('click', -> chooser.click())
+  file.addEventListener('click', -> chooser.click())
 <script>
