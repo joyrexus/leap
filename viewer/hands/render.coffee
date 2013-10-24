@@ -23,19 +23,25 @@ animate = (data) ->
   duration = (data[last].timestamp - data[0].timestamp) / 1000
   step = duration / data.length
   run = -> 
+    window.requestAnimationFrame run
     if data.length
       frame = data.shift()
       left.moveTo frame.left.pos
       right.moveTo frame.right.pos
-      setTimeout (-> window.requestAnimationFrame run), step
   run()
 
-load = (path, done) ->
-  xhr = new XMLHttpRequest()
-  xhr.onreadystatechange = ->
-    if (xhr.readyState is 4) and (xhr.status is 200)
-      done JSON.parse(xhr.responseText)
-  xhr.open("GET", path, true)
-  xhr.send()
+# load handler invoked on change event
+load = -> 
+  File = @files[0]
+  return if not File.type.match '\.json$'
+  file.textContent = File.name
+  reader = new FileReader()
+  reader.onload = (file) ->
+    data = JSON.parse @result
+    animate data
+  reader.readAsText File
 
-root.render = (file) -> load file, animate
+# click and choose a file to load
+chooser = $('#chooser')
+chooser.addEventListener('change', load)
+$('#file').addEventListener('click', -> chooser.click())
