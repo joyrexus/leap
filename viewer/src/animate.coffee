@@ -1,6 +1,5 @@
 root = exports ? this
-paused = false
-offset = 300
+offset = 300    # offset x-value
 
 moveTo = (pos) -> 
   {x, y, z} = pos
@@ -17,11 +16,12 @@ right.moveTo = moveTo
 
 root.animate = (data) -> 
   hands.style.visibility = 'visible'
+  i = 0           # index of current data point
   run = -> 
-    if data.length and not paused
-      window.requestAnimationFrame run
-      d = data.shift()
+    window.requestAnimationFrame run
+    if i < data.length
+      d = data[i]
       left.moveTo d.data('left')
       right.moveTo d.data('right')
+      i += 1
   run()
-

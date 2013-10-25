@@ -76,7 +76,7 @@
     <div id="end">End</div>
   </div>
   <svg id="hands">
-    <rect id="frame" class="bordered" width=960 height="500" />
+    <rect id="frame" class="border" width=960 height="500" />
     <circle id="left" cx="100" cy="100" r="25" />
     <circle id="right" cx="100" cy="100" r="25" />
   </svg>
@@ -102,6 +102,8 @@
     active: false
     begin: null
     end: null
+
+  animateSelection = -> animate points[selection.begin..selection.end]
 
   # highlight and get info on the data point under the cursor
   focus = ->
@@ -144,7 +146,7 @@
         p.stroke(colors.highlight)
         p.data('selected', true)
       clicks = 0                          # reset count
-      # animate points                    # !!! ANIMATION
+      animateSelection()
 
   drawLine = (time, value, tick, color='steelblue') ->
       draw.line(tick, axis, tick, axis - value)
@@ -154,7 +156,7 @@
         .data('color', color)             # original color
         .mouseover(focus)
         .mouseout(-> 
-          if not @data 'clicked' or not @data 'selected'
+          if not (@data('clicked') or @data('selected'))
             @stroke do -> color
         )
         .click(clickSelector)   # handle click-selection
@@ -208,4 +210,5 @@
   # click and choose a file to load
   chooser.addEventListener('change', load)
   file.addEventListener('click', -> chooser.click())
+  hands.addEventListener('click', animateSelection)
 <script>
