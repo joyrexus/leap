@@ -1,214 +1,29 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<script src="lib/coffee-script.js"></script>
 <script src="lib/svg.js"></script>
-<style>
-  body {
-    margin-top: 25px;
-    margin-left: 50px;
-    font-family: "Helvetica Neue", sans-serif;
-    font-weight: 100;
-    font-size: 75px;
-    color: #777;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  svg {
-    margin-top: 25px;
-    margin-bottom: 25px;
-  }
-
-  #file {
-    color: steelblue;
-  }
-
-  #file:hover {
-    color: orange;
-    cursor: pointer;
-  }
-
-  #value {
-    font-weight: 300;
-  }
-
-  .velocity {}
-
-  .border {
-    fill: none;
-    stroke: #777;
-    stroke-width: 2;
-  }
-
-  input {
-    display: none;
-  }
-
-  #range {
-    visibility: hidden;
-  }
-
-  /* SVG screen for viewing hand motions of selected data points */
-  #hands {
-    visibility: hidden;
-  }
-  #frame {
-    fill: whitesmoke;
-  }
-  #left {
-    fill: steelblue;
-    opacity: .6;
-    visibility: hidden;
-  }
-  #right {
-    fill: #777;
-    opacity: .6;
-    visibility: hidden;
-  }
-</style>
+<link href="style.css" rel="stylesheet" />
 <body>
-  <input type="file" id="chooser" />
-  <div id="file">Click and choose sample</div>
-  <div id="time">Time (in seconds)</div>
-  <div id="value">Velocity (in mm/sec)</div>
-  <div id="graph"></div>
-  <div id="range">
-    <div id="begin">Begin</div>
-    <div id="end">End</div>
+  <div id="info">
+    <div id="left-panel">
+      <input type="file" id="chooser" />
+      <div id="file">Click and choose sample</div>
+      <div id="cursor">
+        <div id="time">Time (in seconds)</div>
+        <div id="value">Velocity (in mm/sec)</div>
+      </div>
+    </div>
+    <div id="viewer">
+      <div id="range">
+        <div id="begin">Begin</div>
+        <div id="end">End</div>
+      </div>
+      <svg id="hands" width=300 height="300">
+        <rect id="frame" class="border" width=300 height="300" />
+        <circle id="left" cx="100" cy="100" r="25" />
+        <circle id="right" cx="100" cy="100" r="25" />
+      </svg>
+    </div>
   </div>
-  <svg id="hands">
-    <rect id="frame" class="border" width=960 height="500" />
-    <circle id="left" cx="100" cy="100" r="25" />
-    <circle id="right" cx="100" cy="100" r="25" />
-  </svg>
-
+  <div id="graph"></div>
 <script src="lib/animate.js"></script>
-<script type="text/coffeescript">
-  w = 960         # width
-  h = 800         # height
-  axis = h/2      # place x-axis halfway down
-  tick = 0        # current tick count along x-axis of plot
-  clicks = 0      # number of clicks on plot (0, 1, or 2)
-  skip = false    # uncaptured data to skip?
-  draw = 'graph'  # global var for SVG graph
-  points = []     # plotted velocity data points
-  clicked = []    # clicked data points
-
-  colors =        # color conventions
-    position: 'steelblue'
-    velocity: '#777'
-    highlight: 'orange'
-
-  selection =     # range of selected data points
-    active: false
-    begin: null
-    end: null
-
-  animateSelection = -> animate points[selection.begin..selection.end]
-
-  # highlight and get info on the data point under the cursor
-  focus = ->
-    @stroke colors.highlight
-    time.innerHTML = @data 'time'
-    value.innerHTML = @data 'value'
-
-  # reset selection
-  reset= ->
-    for p in points[selection.begin..selection.end]
-      p.stroke(colors.velocity)
-      p.data('selected', false)
-    selection.active = false
-    selection.end = null
-    end.innerHTML = 'End'
-
-  # click handler for each data point
-  clickSelector = -> 
-    clicks += 1
-    if clicks is 1                        # first click to begin
-      reset()
-      clicked.push @data('clicked', true) # track clicked data points
-      selection.begin = @data 'index'
-      begin.innerHTML = @data 'time'
-      range.style.visibility = 'visible'
-    else                                  # click second time to end
-      selection.active = true
-      if @data('index') < selection.begin
-        selection.end = selection.begin
-        end.innerHTML = begin.innerHTML
-        selection.begin = @data 'index'
-        begin.innerHTML = @data 'time'
-      else
-        selection.end = @data 'index'
-        end.innerHTML = @data 'time'
-      for p in clicked
-        p.data('clicked', false)    # reset click status
-        p.stroke(p.data 'color')    # set back to original color
-      for p in points[selection.begin..selection.end]
-        p.stroke(colors.highlight)
-        p.data('selected', true)
-      clicks = 0                          # reset count
-      animateSelection()
-
-  drawLine = (time, value, tick, color='steelblue') ->
-      draw.line(tick, axis, tick, axis - value)
-        .stroke(color)
-        .data('time', time)
-        .data('value', value)
-        .data('color', color)             # original color
-        .mouseover(focus)
-        .mouseout(-> 
-          if not (@data('clicked') or @data('selected'))
-            @stroke do -> color
-        )
-        .click(clickSelector)   # handle click-selection
-
-  mockLine =  # null line object with mock attrs
-    stroke: -> @
-    data: (key, value) -> 
-      @[key] = value
-      @
-
-  # plot the position and velocity of the y-coord in each frame of data
-  plot = (data) -> 
-    start = data[0].timestamp
-    w = data.length if data.length > w
-    draw = SVG('graph').size(w, h)
-    draw.rect(w, h).attr("class", "border")
-
-    # iterate over each frame/data-point `d`
-    for i, d of data              # `i` is the index of each data point
-      time = (d.timestamp - start) / 1000000    # in seconds
-      position = d.left.pos.y     # y-coord position of left hand
-      velocity = d.left.vel.y     # y-coord velocity of left hand (mm/s)
-      if position
-        skip = false              # don't skip next empty value
-        tick += 1                 # move over 1 tick on axis
-        drawLine(time, position, tick)
-          .data('index', i)       # add index for making selections
-        v = drawLine(time, velocity, tick, color="#777")
-          .data('index', i)       # add index for making selections
-          .data('left', d.left.pos)     # left position coords
-          .data('right', d.right.pos)   # right position coords
-          .opacity(.8)
-        points.push v             # add data point for velocity
-      else
-        tick += 10 if not skip    # create empty space
-        skip = true               # skip additional empty values
-        points.push mockLine
-
-  velocity = (d) -> d.left.vel.y  # y-coord position of left hand
-  position = (d) -> d.left.pos.y  # y-coord velocity of left hand
-
-  # load handler invoked on change event
-  load = -> 
-    File = @files[0]
-    return if not File.type.match '\.json$'
-    file.textContent = File.name
-    reader = new FileReader()
-    reader.onload = (file) -> plot JSON.parse @result
-    reader.readAsText File
-
-  # click and choose a file to load
-  chooser.addEventListener('change', load)
-  file.addEventListener('click', -> chooser.click())
-  hands.addEventListener('click', animateSelection)
-<script>
+<script src="lib/main.js"></script>

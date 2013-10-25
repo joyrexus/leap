@@ -1,0 +1,83 @@
+body {
+  margin-top: 25px;
+  margin-left: 50px;
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 100;
+  font-size: 75px;
+  color: #777;
+  -webkit-font-smoothing: antialiased;
+}
+
+svg {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  margin-right: 50px;
+}
+
+#file {
+  color: steelblue;
+}
+
+#file:hover {
+  color: orange;
+  cursor: pointer;
+}
+
+#value {
+  font-weight: 300;
+}
+
+.velocity {}
+
+.border {
+  fill: none;
+  stroke: #777;
+  stroke-width: 2;
+}
+
+#info {
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+}
+
+input {
+  display: none;
+}
+
+#cursor {
+  visibility: hidden;
+}
+
+#viewer {
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  margin-left: 50px;
+  padding-left: 25px;
+  border-left: 1px solid #E2E2E2;
+  visibility: hidden;
+}
+
+#range {
+  margin-top: 15px;
+  font-size: 50px;
+}
+
+/* SVG screen for viewing hand motions of selected data points */
+#hands {
+  margin-top: 0px;
+  margin-left: 25px;
+  visibility: hidden;
+}
+#frame {
+  fill: whitesmoke;
+}
+#left {
+  fill: steelblue;
+  opacity: .6;
+  visibility: hidden;
+}
+#right {
+  fill: #777;
+  opacity: .6;
+  visibility: hidden;
+}
