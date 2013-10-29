@@ -2,13 +2,7 @@ Our initial viewer is deployed [here](http://joyrexus.github.io/sandbox/leap/vie
 
 It plots the left hand's y-coordinate position and velocity from a given gesture sample and is designed to make it easy to identify particular intervals of interest.
 
-Note, however, that it currently only works on converted data samples.  (I.e., sample files where I've extracted out just the the time, position, and velocity info.  These are much smaller than the original files.)  
-
----
-
-TODO: provide details on converted data samples and how they're generated.
-
----
+Note, however, that it currently only works on converted data samples.  (I.e., sample files where I've extracted out just the the time, position, and velocity info.  These are much smaller than the original files.)  See [this gist](https://gist.github.com/joyrexus/7218817) for details on how we converted the original gesture samples.
 
 Also note that I've only tested it with Chrome, so I'd recommend using that instead of some other browser.
 
