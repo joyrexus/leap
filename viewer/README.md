@@ -16,12 +16,12 @@ I've now got it setup so you can select particular regions and actually see the 
 
 After loading the `sample.json` file and before making a selection:
 
-![pre-selection](pre-selection.png)
+![pre-selection](images/pre-selection.png)
 
 Note that the hand's y-coordinate position is graphed in blue and velocity in grey.  I found that it's useful/necessary to see both. 
 
 After making a selection:
 
-![post-selection](post-selection.png)
+![post-selection](images/post-selection.png)
 
 Note the animated hand viewer appears after making a selection, with the start and stop times in seconds to the left.  I think this gives you a better idea of the gesture occurring during the selected interval and should make it easier to match up with the audio/video.
