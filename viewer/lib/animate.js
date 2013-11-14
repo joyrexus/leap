@@ -12,7 +12,7 @@
     var cx, cy, dy, r, x, y, z;
     x = pos.x, y = pos.y, z = pos.z;
     dy = y - 240;
-    cy = ((dy / 260) * (h / 2)) + (h / 2);
+    cy = (h / 2) - ((dy / 260) * (h / 2));
     cx = ((x / 260) * (w / 2)) + (w / 2);
     r = 15 + (z / 10);
     if (x && y) {
