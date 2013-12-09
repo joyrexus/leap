@@ -1,6 +1,5 @@
 readline = require 'readline'
-ws = require('websocket-stream')
-thru = require 'through'
+WebSocket = require 'ws'
 
 
 filter = ->
@@ -18,17 +17,17 @@ filter = ->
 
   thru(write, end)
 
-
 prompt = readline.createInterface(
   input: process.stdin
   output: process.stdout
 )
 
 prompt.question 'Hit return to start recording ', ->
-  stream = ws 'ws://localhost:6437'
-  stream
-    .pipe(filter())
-    # .pipe(process.stdout)
+  stream = new WebSocket 'ws://localhost:6437'
+  stream.on 'message', (data, flags) ->
+    if data
+      data = JSON.parse(data)
+
   prompt.question 'Hit return again to stop recording ', -> 
-    stream.end()
+    stream.close()
     prompt.close()

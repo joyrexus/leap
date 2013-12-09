@@ -5,7 +5,7 @@ split = require 'split'
 filter = ->
 
   write = (data) -> 
-    if data
+    if data.id
       d =                               # queue attributes of interest
         id: data.id
         hands: data.hands         
