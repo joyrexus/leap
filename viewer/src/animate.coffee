@@ -5,7 +5,7 @@ h = 300   # default height of interaction box
 moveTo = (pos) -> 
   {x, y, z} = pos
   dy = y - 240                      # y-coord minus y-center point
-  cy = ((dy/260) * (h/2)) + (h/2)   # center y-coord at
+  cy = (h/2) - ((dy/260) * (h/2))   # center y-coord at
   cx = ((x/260) * (w/2)) + (w/2)    # center x-coord at
   r  = 15 + (z/10)                  # scale radius based on z-coord
   if x and y
