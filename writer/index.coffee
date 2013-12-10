@@ -1,34 +1,21 @@
+{createWriteStream} = require 'fs'
 readline = require 'readline'
-ws = require('websocket-stream')
-thru = require 'through'
-
-
-filter = ->
-
-  write = (data) -> 
-    if data
-      data = JSON.parse(data)
-      if data.id
-        d =                               # queue attributes of interest
-          id: data.id
-          hands: data.hands
-        @queue JSON.stringify(d) + '\n'
-
-  end = -> @queue null                    # append EOF string if desired
-
-  thru(write, end)
-
+ws = require 'websocket-stream'
+filter = require './filter/hands'
 
 prompt = readline.createInterface(
   input: process.stdin
   output: process.stdout
 )
 
-prompt.question 'Hit return to start recording ', ->
+prompt.question 'Hit return to start recording ... ', ->
   stream = ws 'ws://localhost:6437'
+  toFile = createWriteStream(process.argv[2] or 'sample.json.lsv')
+
   stream
-    .pipe(filter())
-    # .pipe(process.stdout)
-  prompt.question 'Hit return again to stop recording ', -> 
+    .pipe(filter)
+    .pipe(toFile)
+
+  prompt.question 'Hit return again to stop recording ... ', -> 
     stream.end()
     prompt.close()
