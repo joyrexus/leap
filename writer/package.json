@@ -2,7 +2,6 @@
   "dependencies": {
     "split": "~0.2",
     "through": ">=2",
-    "websocket-stream": ">=0.3.3",
-    "ws": "~0.4.30"
+    "websocket-stream": ">=0.3.3"
   }
 }
